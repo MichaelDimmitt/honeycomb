@@ -94,10 +94,16 @@ const honeyCanvas = (() => {
       div.setAttribute('data-rowIndex', rowIndex)
       return div
     }
-
+    const cellBeautySalon = ({ inputs: { cell, columnIndex, size, padding, rowIndex } }) => { // columnIndex, size, padding, rowIndex
+      const x = (columnIndex * 3 / 4 * size) + padding * columnIndex
+      const y = (rowIndex * size + (columnIndex % 2 === 1 ? (1 / 2 * size) : 0)) + padding * rowIndex
+      cell.style.left = x + 'px'
+      cell.style.top = y + 'px'
+      return cell
+    }
     const drawHive = (({inputs, dependencies}) => {
       let {size, padding, root, elements} = inputs;
-      let {hive, cellFactory} = dependencies;
+      let {hive, cellFactory, cellBeautySalon} = dependencies;
       hive.forEach((row, rowIndex) => {
         const elementRow = []
         row.forEach((value, columnIndex) => {
@@ -105,18 +111,15 @@ const honeyCanvas = (() => {
             inputs: { filled:value, columnIndex:columnIndex, rowIndex:rowIndex},
             dependencies: { handleCellMouseOver, handleCellMouseOut }
           })
-          const x = (columnIndex * 3 / 4 * size) + padding * columnIndex
-          const y = (rowIndex * size + (columnIndex % 2 === 1 ? (1 / 2 * size) : 0)) + padding * rowIndex
-          cell.style.left = x + 'px'
-          cell.style.top = y + 'px'
-          elementRow.push(cell)
-          root.append(cell)
+          const cellBeauty = cellBeautySalon({
+            inputs: { cell: cell, columnIndex: columnIndex, size: size, padding: padding, rowIndex: rowIndex }
+          })
+          root.append(cellBeauty)
+          elementRow.push(cellBeauty)
         })
         elements.push(elementRow)
       })
     })
-
-
 
     return {
       hive: hive,
@@ -134,17 +137,21 @@ const honeyCanvas = (() => {
       handleCellMouseOver: handleCellMouseOver,
       handleCellMouseOut: handleCellMouseOut,
       hive: hive,
-      cellFactory: cellFactory
-
+      cellFactory: cellFactory,
+      cellBeautySalon: cellBeautySalon
     }
     console.log(false)
   }
   function init(preset) {
     let p = playground(preset);
     let hivey = p.hive;
+    // cellFactory({
+    //   inputs: { filled:value, columnIndex:columnIndex, rowIndex:rowIndex},
+    //   dependencies: { handleCellMouseOver, handleCellMouseOut }
+    // })
     p.drawHive({
       inputs: {size: p.size, padding: p.padding, root:p.root, elements:p.elements},
-      dependencies: {hive: p.hive, cellFactory: p.cellFactory}
+      dependencies: {hive: p.hive, cellFactory: p.cellFactory, cellBeautySalon: p.cellBeautySalon}
     })
   }
 
