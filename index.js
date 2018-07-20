@@ -139,7 +139,6 @@ const honeyCanvas = (() => {
       getAdjacentCells: getAdjacentCells,
       handleCellMouseOver: handleCellMouseOver,
       handleCellMouseOut: handleCellMouseOut,
-      hive: hive,
       cellFactory: cellFactory,
       cellBeautySalon: cellBeautySalon
     }
@@ -147,14 +146,15 @@ const honeyCanvas = (() => {
   }
   function init(preset) {
     let p = playground(preset);
-    let hivey = p.hive;
+    let hive = p.hive;
     // cellFactory({
     //   inputs: { filled:value, columnIndex:columnIndex, rowIndex:rowIndex},
     //   dependencies: { handleCellMouseOver, handleCellMouseOut }
     // })
+    const elements = []
     p.drawHive({
       inputs: {size: p.size, padding: p.padding, root:p.root, elements:p.elements},
-      dependencies: {hive: p.hive, cellFactory: p.cellFactory, cellBeautySalon: p.cellBeautySalon}
+      dependencies: {hive: hive, cellFactory: p.cellFactory, cellBeautySalon: p.cellBeautySalon}
     })
   }
 
