@@ -59,7 +59,8 @@ const honeyCanvas = (() => {
         getElementFromCoords({ input: { x: ex, y: sy }, dependencies: {elements} }), // SE
       ].filter(x => !!x)
     }
-    const handleCellMouseOver = (event) => { // external functions: getCoordsFromElement, getAdjacentCells, addClass
+    // arrow functions inherit the this binding of the containing function, IE... event
+    const handleCellMouseOver = ({ dependencies: { className, getIntAttr, getCoordsFromElement, getAdjacentCells, getElementFromCoords, addClass } } ) => { // external functions: getCoordsFromElement, getAdjacentCells, addClass
       const target = event.target;
       const coords = getCoordsFromElement({ input: target, dependencies: getIntAttr })
       addClass( {input: { target:target, className:'hover'}, dependencies: {indexOf:'test'}}  )
@@ -69,7 +70,7 @@ const honeyCanvas = (() => {
         addClass( {input: { target:cell, className:'adjacent'}, dependencies: {indexOf:'test'}} )
       })
     }
-    const handleCellMouseOut = (event) => { // external functions: removeClass, getCoordsFromElement, getAdjacentCells
+    const handleCellMouseOut = ({ dependencies: { className, getIntAttr, getCoordsFromElement, getAdjacentCells, getElementFromCoords, removeClass } }) => { // external functions: removeClass, getCoordsFromElement, getAdjacentCells
       const target = event.target
       const coords = getCoordsFromElement({ input: target, dependencies: getIntAttr })
 
@@ -79,16 +80,27 @@ const honeyCanvas = (() => {
         removeClass({ inputs: {target: cell, value:'adjacent'},dependencies: 'test'})
       })
     }
-    const cellFactory = ({inputs, dependencies}) => { // external functions: handleCellMouseOver, handleCellMouseOut
-      // console.log(inputs)
-      let {filled, columnIndex, rowIndex} = inputs
-
+    const cellFactory = ({inputs: {filled, columnIndex, rowIndex}, dependencies: {handleCellMouseOver, handleCellMouseOut}}) => { // external functions: handleCellMouseOver, handleCellMouseOut
       const div = document.createElement('div')
       const className = 'cell' + (filled ? ' filled' : '')
       div.className = className
       if (filled) {
-        div.addEventListener('mouseover', dependencies.handleCellMouseOver)
-        div.addEventListener('mouseout', dependencies.handleCellMouseOut)
+        div.addEventListener('mouseover', () => {
+          handleCellMouseOver({
+            dependencies: {
+              className:className, getIntAttr: getIntAttr, getCoordsFromElement:getCoordsFromElement,
+              getAdjacentCells:getAdjacentCells, getElementFromCoords: getElementFromCoords, addClass:addClass
+            }
+          });
+        })
+        div.addEventListener('mouseout', () => {
+          handleCellMouseOut({
+            dependencies: {
+              className:className, getIntAttr: getIntAttr, getCoordsFromElement:getCoordsFromElement,
+              getAdjacentCells:getAdjacentCells, getElementFromCoords: getElementFromCoords, removeClass:removeClass
+            }
+          });
+        })
       }
       div.setAttribute('data-columnIndex', columnIndex)
       div.setAttribute('data-rowIndex', rowIndex)
@@ -101,15 +113,16 @@ const honeyCanvas = (() => {
       cell.style.top = y + 'px'
       return cell
     }
-    const drawHive = (({inputs, dependencies}) => {
-      let {size, padding, root, elements} = inputs;
-      let {hive, cellFactory, cellBeautySalon} = dependencies;
+    const drawHive = (( { inputs: { size, padding, root, elements }, dependencies: { hive, cellFactory, cellBeautySalon } } ) => {
       hive.forEach((row, rowIndex) => {
         const elementRow = []
         row.forEach((value, columnIndex) => {
           const cell = cellFactory({
             inputs: { filled:value, columnIndex:columnIndex, rowIndex:rowIndex},
-            dependencies: { handleCellMouseOver, handleCellMouseOut }
+            dependencies: {
+              handleCellMouseOver:handleCellMouseOver,
+              handleCellMouseOut:handleCellMouseOut
+            }
           })
           const cellBeauty = cellBeautySalon({
             inputs: { cell: cell, columnIndex: columnIndex, size: size, padding: padding, rowIndex: rowIndex }
@@ -121,6 +134,7 @@ const honeyCanvas = (() => {
         console.log('element rows', elementRow)
         elements.push(elementRow)
       })
+      return elements
       console.log('here are all the elements', elements)
     })
 
