@@ -114,11 +114,14 @@ const honeyCanvas = (() => {
           const cellBeauty = cellBeautySalon({
             inputs: { cell: cell, columnIndex: columnIndex, size: size, padding: padding, rowIndex: rowIndex }
           })
+          console.log('this cell has style', cellBeauty)
           root.append(cellBeauty)
           elementRow.push(cellBeauty)
         })
+        console.log('element rows', elementRow)
         elements.push(elementRow)
       })
+      console.log('here are all the elements', elements)
     })
 
     return {
