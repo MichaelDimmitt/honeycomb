@@ -87,18 +87,12 @@ const honeyCanvas = (() => {
       if (filled) {
         div.addEventListener('mouseover', () => {
           handleCellMouseOver({
-            dependencies: {
-              className:className, getIntAttr: getIntAttr, getCoordsFromElement:getCoordsFromElement,
-              getAdjacentCells:getAdjacentCells, getElementFromCoords: getElementFromCoords, addClass:addClass
-            }
+            dependencies: { className, getIntAttr, getCoordsFromElement, getAdjacentCells, getElementFromCoords, addClass }
           });
         })
         div.addEventListener('mouseout', () => {
           handleCellMouseOut({
-            dependencies: {
-              className:className, getIntAttr: getIntAttr, getCoordsFromElement:getCoordsFromElement,
-              getAdjacentCells:getAdjacentCells, getElementFromCoords: getElementFromCoords, removeClass:removeClass
-            }
+            dependencies: { className, getIntAttr, getCoordsFromElement, getAdjacentCells, getElementFromCoords, removeClass }
           });
         })
       }
@@ -118,14 +112,14 @@ const honeyCanvas = (() => {
         const elementRow = []
         row.forEach((value, columnIndex) => {
           const cell = cellFactory({
-            inputs: { filled:value, columnIndex:columnIndex, rowIndex:rowIndex},
+            inputs: { filled:value, columnIndex, rowIndex},
             dependencies: {
-              handleCellMouseOver:handleCellMouseOver,
-              handleCellMouseOut:handleCellMouseOut
+              handleCellMouseOver,
+              handleCellMouseOut
             }
           })
           const cellBeauty = cellBeautySalon({
-            inputs: { cell: cell, columnIndex: columnIndex, size: size, padding: padding, rowIndex: rowIndex }
+            inputs: { cell, columnIndex, size, padding, rowIndex }
           })
           console.log('this cell has style', cellBeauty)
           root.append(cellBeauty)
